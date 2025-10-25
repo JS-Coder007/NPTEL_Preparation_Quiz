@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conservation Geography Quiz</title>
+    <style>
+        :root {
+            --color-primary: #2c7873;
+            --color-primary-light: #3d9991;
+            --color-success: #28a745;
+            --color-danger: #dc3545;
+            --color-background: #f8f9fa;
+            --color-card: #ffffff;
+            --color-text: #2c3e50;
+            --color-text-light: #6c757d;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--color-text);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--color-card);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--color-primary);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--color-text-light);
+            font-size: 1.1em;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--color-card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-card .label {
+            color: var(--color-text-light);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .quiz-card {
+            background: var(--color-card);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .question-number {
+            background: var(--color-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .assignment-tag {
+            background: #e9ecef;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: var(--color-text-light);
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: var(--color-text);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option:hover:not(.selected):not(.correct):not(.incorrect) {
+            background: #e9ecef;
+            border-color: var(--color-primary-light);
+            transform: translateX(5px);
+        }
+
+        .option-label {
+            background: var(--color-primary);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .option.selected {
+            border-color: var(--color-primary);
+            background: #e3f2fd;
+        }
+
+        .option.correct {
+            border-color: var(--color-success);
+            background: #d4edda;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .option.correct .option-label {
+            background: var(--color-success);
+        }
+
+        .option.incorrect {
+            border-color: var(--color-danger);
+            background: #f8d7da;
+            animation: shake 0.5s ease;
+        }
+
+        .option.incorrect .option-label {
+            background: var(--color-danger);
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-light);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .completion-card {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .completion-card h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .completion-card p {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .quiz-card {
+                padding: 25px;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Conservation Geography Quiz</h1>
+            <p>Test your knowledge with 120 randomized questions</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="label">Question</div>
+                <div class="value" id="currentQuestion">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Score</div>
+                <div class="value" id="score">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Correct</div>
+                <div class="value" id="correct">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Incorrect</div>
+                <div class="value" id="incorrect">0</div>
+            </div>
+        </div>
+
+        <div id="quizSection" class="quiz-card">
+            <div class="question-header">
+                <span class="question-number" id="questionNum">Question 1</span>
+                <span class="assignment-tag" id="assignmentTag">Assignment 1</span>
+            </div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options" id="optionsContainer"></div>
+        </div>
+
+        <div id="completionSection" class="completion-card hidden">
+            <h2>🎉 Quiz Complete!</h2>
+            <p>Congratulations on completing all 120 questions!</p>
+            <div class="score-display" id="finalScore">0/120</div>
+            <p id="percentage"></p>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="resetQuiz()">Start New Quiz</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" onclick="resetQuiz()">Reset Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {q: '"Science of relationships between organisms and their environments" is the definition of:', o: ['conservation', 'preservation', 'environmentalism', 'ecology'], a: 3, assign: 1},
+            {q: 'The Trinity explosion of 1945 is taken as the beginning of the', o: ['Holocene', 'Cenocene', 'Anthropocene', 'Eocene'], a: 2, assign: 1},
+            {q: 'Sustainable harvest of resources falls under the category of:', o: ['conservation', 'preservation', 'environmentalism', 'none of the above'], a: 0, assign: 1},
+            {q: 'The quantum of human impacts can be written as', o: ['I = P + A + T', 'I = P X A + T', 'I = P X A X T', 'I = P + A X T'], a: 2, assign: 1},
+            {q: 'The discipline of Demography is most closely related to:', o: ['Phytogeography', 'Zoogeography', 'Population Geography', 'Economic Geography'], a: 2, assign: 1},
+            {q: '"The rate of any biological process is limited by that factor in least amount relative to requirement, so there is a single limiting factor." This is the statement for', o: ["Liebig's law of the minimum", "Liebig's law of the maximum", "Shelford's law of tolerance", "Shelford's law of intolerance"], a: 0, assign: 1},
+            {q: '"The geographical distribution of a species will be controlled by that environmental factor for which the organism has the narrowest range of tolerance." This is the statement for', o: ["Liebig's law of the minimum", "Liebig's law of the maximum", "Shelford's law of tolerance", "Shelford's law of intolerance"], a: 2, assign: 1},
+            {q: 'The regional approach to Geography was developed by:', o: ['Alexander von Humboldt', 'Karl Ritter', 'Rene Descartes', 'Eratosthenes'], a: 1, assign: 1},
+            {q: 'Good climate is a', o: ['chemical factor', 'demographic factor', 'push factor', 'pull factor'], a: 3, assign: 1},
+            {q: 'Scarcity of food is a', o: ['chemical factor', 'demographic factor', 'push factor', 'pull factor'], a: 2, assign: 1},
+            {q: 'In an undisturbed sedimentary strata, bottom layers are older than layers above them. This is known as', o: ['Principle of superposition', 'Principle of original horizontality', 'Principle of lateral continuity', 'Principle of inclusions'], a: 0, assign: 2},
+            {q: 'Mount Vesuvius is an example of', o: ['Shield volcano', 'Composite volcano', 'Caldera', 'Flood basalt province'], a: 1, assign: 2},
+            {q: 'Krakatoa eruption resulted in the formation of', o: ['Shield volcano', 'Stratovolcano', 'Caldera', 'Flood basalt province'], a: 2, assign: 2},
+            {q: 'Which of these is not a method of absolute dating?', o: ['radioisotope dating', 'thermoluminescence dating', 'inclusion study', 'fission track dating'], a: 2, assign: 2},
+            {q: 'Which of these is true about S waves?', o: ['They are longitudinal in nature', 'They are transverse in nature', 'They cannot move through solids, liquids and gases', 'They are the first to reach the surface of the Earth'], a: 1, assign: 2},
+            {q: 'Hawaiian volcanoes are an example of', o: ['Shield volcano', 'Stratovolcano', 'Caldera', 'Flood basalt province'], a: 0, assign: 2},
+            {q: 'Within a depositional basin, strata are laterally continuous in all directions till the edge of the basin. This is known as', o: ['Principle of superposition', 'Principle of original horizontality', 'Principle of lateral continuity', 'Principle of inclusions'], a: 2, assign: 2},
+            {q: 'Which of these is a gas giant?', o: ['Mercury', 'Venus', 'Mars', 'Saturn'], a: 3, assign: 2},
+            {q: 'Assemblage of fossils are unique to the time that they lived in, and so can be used to age rocks across a wide geographic distribution. This is known as', o: ['Principle of fossil succession', 'Principle of original horizontality', 'Principle of superposition', 'Principle of cross-cutting relationships'], a: 0, assign: 2},
+            {q: 'Which of these is an example of direct source of information about the Earth?', o: ['earthquake', 'volcanic eruption', 'magnetic survey', 'gravity anomaly'], a: 1, assign: 2},
+            {q: '"the points where three or more cirques meet" is the definition of', o: ['cirque', 'arete', 'horn', 'hanging valley'], a: 2, assign: 3},
+            {q: 'Which of these is an example of endogenic process?', o: ['weathering', 'mass movement', 'erosion', 'folding'], a: 3, assign: 3},
+            {q: 'Sandstone is an example of', o: ['siliciclastic rock', 'carbonate rock', 'evaporite rock', 'phosphatic rock'], a: 0, assign: 3},
+            {q: '"smooth oval-shaped ridge-like features comprised of glacial till, gravel and sand arranged parallel to the direction of ice movement" is the definition of', o: ['glacial till', 'outwash deposit', 'esker', 'drumlin'], a: 3, assign: 3},
+            {q: 'Which of these is an example of exogenic process?', o: ['volcanism', 'earthquake', 'plate tectonics', 'deposition'], a: 3, assign: 3},
+            {q: '"white or colourless hard mineral virtually insoluble in water" is a description of', o: ['amphiboles', 'quartz', 'feldspar', 'pyroxene'], a: 1, assign: 3},
+            {q: 'Dolomite is an example of', o: ['siliciclastic rock', 'carbonate rock', 'evaporite rock', 'phosphatic rock'], a: 1, assign: 3},
+            {q: '"green or black coloured inosilicate minerals forming prism or needle-like crystals" is a description of', o: ['amphiboles', 'feldspar', 'mica', 'pyroxene'], a: 0, assign: 3},
+            {q: '"deep, long and wide troughs or basins with very steep concave to vertically dropping high walls as its head and sides" is the definition of', o: ['cirque', 'arete', 'horn', 'hanging valley'], a: 0, assign: 3},
+            {q: '"magnesium iron silicate; a primary component of the Earth\'s upper mantle" is a description of', o: ['amphiboles', 'feldspar', 'quartz', 'olivine'], a: 3, assign: 3},
+            {q: 'Which of these air masses is generally cool and moist?', o: ['cP', 'cT', 'mP', 'mT'], a: 2, assign: 4},
+            {q: 'Which of these air masses is generally cold and dry?', o: ['cP', 'cT', 'mP', 'mT'], a: 0, assign: 4},
+            {q: 'The ISS orbits in which layer?', o: ['Troposphere', 'Stratosphere', 'Mesosphere', 'Thermosphere'], a: 3, assign: 4},
+            {q: 'The government came up with a regulation that incandescent bulbs be replaced by LED bulbs, so that electricity consumption and release of carbon dioxide from power plants is reduced. In the context of climate change, such an action would be called', o: ['adaptation', 'mitigation', 'deceleration', 'maladaptation'], a: 1, assign: 4},
+            {q: 'Surplus seed and sperm banking is an adaptation option to facilitate', o: ['resistance to climate changes', 'resilience to climate changes', 'response to climate changes', 'none of these'], a: 1, assign: 4},
+            {q: 'The classical period for taking averages for climate is', o: ['10 years', '20 years', '30 years', '40 years'], a: 2, assign: 4},
+            {q: 'Noctilucent clouds are present in which layer?', o: ['Troposphere', 'Stratosphere', 'Mesosphere', 'Thermosphere'], a: 2, assign: 4},
+            {q: 'Because of climate change, Mudumalai Tiger Reserve is suffering from frequent droughts. The management has built several artificial water holes for animals, and fills them up regularly with tankers. In the context of climate change, such an action would be called', o: ['adaptation', 'mitigation', 'deceleration', 'maladaptation'], a: 0, assign: 4},
+            {q: 'Which of these is home to the ozone layer?', o: ['Troposphere', 'Stratosphere', 'Mesosphere', 'Thermosphere'], a: 1, assign: 4},
+            {q: 'Most of the weather phenomena occur in', o: ['Troposphere', 'Stratosphere', 'Mesosphere', 'Thermosphere'], a: 0, assign: 4},
+            {q: 'Equal density curves are called', o: ['isopycnal curves', 'isohaline curves', 'isotherm curves', 'isobuoyant curves'], a: 0, assign: 5},
+            {q: 'Which of these is a minor feature of the ocean floor?', o: ['continental shelf', 'continental slope', 'guyot', 'abyssal plain'], a: 2, assign: 5},
+            {q: '"mountains with pointed summits rising from the sea floor, but not reaching the surface of the ocean" is a description of', o: ['oceanic deep / trench', 'mid-oceanic ridge', 'seamount', 'atoll'], a: 2, assign: 5},
+            {q: 'Which of these is the largest habitat on the Earth?', o: ['continental shelf', 'continental slope', 'guyot', 'abyssal plain'], a: 3, assign: 5},
+            {q: 'Which of these are the largest mountain ranges on Earth?', o: ['oceanic deep / trench', 'mid-oceanic ridge', 'seamount', 'atoll'], a: 1, assign: 5},
+            {q: '"deep valleys, often cutting across continental shelves and slopes" is a description of', o: ['oceanic deep / trench', 'mid-oceanic ridge', 'guyot', 'submarine canyon'], a: 3, assign: 5},
+            {q: 'Continental slope has a gradient of', o: ['0-1 degree', '1-2 degree', '2-5 degree', '5-10 degree'], a: 2, assign: 5},
+            {q: 'Which of these is not a prominent tidal pattern?', o: ['diurnal', 'mixed diurnal', 'semidiurnal', 'mixed semidiurnal'], a: 1, assign: 5},
+            {q: '"relatively steep-sided, narrow, deep basins" is a description of', o: ['oceanic deep / trench', 'mid-oceanic ridge', 'seamount', 'atoll'], a: 0, assign: 5},
+            {q: 'In the sea, a layer where the temperature decreases rapidly from the mixed upper layer to the cold deeper layer is called', o: ['isopycnal', 'thermophil', 'thermohaline', 'thermocline'], a: 3, assign: 5},
+            {q: 'In Koeppen classification, which is hot summer temperature?', o: ['h', 'k', 'a', 'b'], a: 2, assign: 6},
+            {q: 'In Koeppen classification, which is desert precipitation?', o: ['W', 'S', 'f', 's'], a: 0, assign: 6},
+            {q: "India's location is", o: ['Equatorial in South, Tropical in North', 'Tropical in South, Equatorial in North', 'Tropical in South, Sub-tropical in North', 'Sub-tropical in South, Tropical in North'], a: 2, assign: 6},
+            {q: 'In Koeppen classification, which is cold arid temperature?', o: ['h', 'k', 'a', 'b'], a: 1, assign: 6},
+            {q: 'In Koeppen classification, which is winter dry precipitation?', o: ['w', 'S', 'f', 's'], a: 0, assign: 6},
+            {q: 'In Koeppen classification, which is cool summer temperature?', o: ['c', 'd', 'F', 'T'], a: 0, assign: 6},
+            {q: 'Which of these is the correct sequence of seasons in India?', o: ['Hot weather season → Retreating monsoon season → South-West monsoon season → Cold weather season', 'Hot weather season → South-West monsoon season → Retreating monsoon season → Cold weather season', 'Hot weather season → Cold weather season → South-West monsoon season → Retreating monsoon season', 'Hot weather season → South-West monsoon season → Cold weather season → Retreating monsoon season'], a: 1, assign: 6},
+            {q: 'In Koeppen classification, which is monsoonal precipitation?', o: ['W', 'S', 'm', 's'], a: 2, assign: 6},
+            {q: 'Physiography is the outcome of', o: ['structure', 'process', 'stage of development', 'all of these'], a: 3, assign: 6},
+            {q: 'In Koeppen classification, which is equatorial climate?', o: ['A', 'B', 'C', 'D'], a: 0, assign: 6},
+            {q: 'Soil formation is dependent upon', o: ['vegetation', 'time', 'climate', 'all of the above'], a: 3, assign: 7},
+            {q: 'Which of these is not a characteristic of pioneer species', o: ['ability to grow on bare rocks', 'ability to tolerate extreme temperatures', 'large size', 'short life span'], a: 2, assign: 7},
+            {q: '"groups of actually or potentially interbreeding natural populations, which are reproductively isolated from other such groups" is a definition of', o: ['cells', 'species', 'ecosystems', 'biomes'], a: 1, assign: 7},
+            {q: 'Mechanical action of ocean waves is an example of', o: ['chemical weathering', 'physical weathering', 'biological weathering', 'none of the above'], a: 1, assign: 7},
+            {q: 'The climax near Tindni village is being controlled by disturbance by cattle. This is an example of', o: ['climatic climax', 'edaphic climax', 'disclimax', 'catastrophic climax'], a: 2, assign: 7},
+            {q: 'Carbonation is an example of', o: ['chemical weathering', 'physical weathering', 'biological weathering', 'none of the above'], a: 0, assign: 7},
+            {q: 'In soil profile, C refers to', o: ['organic surface layer', 'topsoil layer', 'subsoil layer', 'substratum layer'], a: 3, assign: 7},
+            {q: 'A climax caused by wildfires is an example of', o: ['climatic climax', 'edaphic climax', 'disclimax', 'catastrophic climax'], a: 3, assign: 7},
+            {q: 'Regur is a term for', o: ['black cotton soil', 'alluvial soil', 'saline soil', 'red and yellow soil'], a: 0, assign: 7},
+            {q: '"the diversity that exists among different geographies" is', o: ['alpha (α) biodiversity', 'beta (β) biodiversity', 'gamma (γ) biodiversity', 'delta (δ) biodiversity'], a: 2, assign: 7},
+            {q: 'The fig tree bears fruits in times when animals do not have much access to food. In this context, it would be a good example of', o: ['least concern species', 'keystone species', 'flagship species', 'extinct species'], a: 1, assign: 8},
+            {q: 'The "subset of physical and biotic environmental factors that permit an animal (or plant) to survive and reproduce" is the definition of', o: ['habitat', 'ecosystem', 'biome', 'biosphere'], a: 0, assign: 8},
+            {q: 'Which of these correctly represents the process of habitat fragmentation and loss?', o: ['Original forest → Dissection → Perforation → Fragmentation → Attrition', 'Original forest → Dissection → Attrition → Fragmentation → Perforation', 'Original forest → Dissection → Perforation → Attrition → Fragmentation', 'Original forest → Dissection → Fragmentation → Perforation → Attrition'], a: 2, assign: 8},
+            {q: 'Soil formation is an example of', o: ['provisioning service', 'regulating service', 'supporting service', 'cultural service'], a: 2, assign: 8},
+            {q: 'Biological control of pest populations is an example of', o: ['provisioning service', 'regulating service', 'supporting service', 'cultural service'], a: 1, assign: 8},
+            {q: 'The acronym HIPPO does not include', o: ['habitat loss', 'invasive species', 'pollination', 'pollution'], a: 2, assign: 8},
+            {q: 'The tiger has a home range of several square kilometres, regulates the ecosystem through controlling herbivore populations and trophic cascades, and people come to tiger reserves to watch tigers. Thus, the tiger can be called as', o: ['umbrella species', 'keystone species', 'flagship species', 'all of the above'], a: 3, assign: 8},
+            {q: 'People come to Sessa orchid sanctuary in Arunachal Pradesh to witness orchids, which in this context would be classified as', o: ['umbrella species', 'keystone species', 'flagship species', 'extinct species'], a: 2, assign: 8},
+            {q: 'Captive breeding is an example of', o: ['in-situ conservation', 'ex-situ conservation', 'in-situ preservation', 'ex-situ preservation'], a: 1, assign: 8},
+            {q: 'We prefer those areas for the creation of a conservation reserve where the level of threat is', o: ['very high', 'medium', 'very low', 'non-existent'], a: 1, assign: 8},
+            {q: 'According to Malthusian model,', o: ['Population grows in geometric progression, food supply increases in arithmetic progression', 'Population grows in geometric progression, food supply increases in geometric progression', 'Population grows in arithmetic progression, food supply increases in arithmetic progression', 'Population grows in arithmetic progression, food supply increases in geometric progression'], a: 0, assign: 9},
+            {q: 'Which of these is commonly observed during humanising of nature?', o: ['environmental determinism', 'possibilism', 'neodeterminism', 'stop and go determinism'], a: 1, assign: 9},
+            {q: 'Which of these is a pillar of sustainability', o: ['social sustainability', 'industrial sustainability', 'agricultural sustainability', 'trans-boundary sustainability'], a: 0, assign: 9},
+            {q: 'Which of these is commonly observed in primitive societies?', o: ['environmental determinism', 'possibilism', 'neodeterminism', 'stop and go determinism'], a: 0, assign: 9},
+            {q: 'The demographic transition sees a society move from', o: ['high birth rate, low death rate to low birth rate, high death rate', 'low birth rate, high death rate to low birth rate, low death rate', 'high birth rate, high death rate to low birth rate, low death rate', 'high birth rate, high death rate to low birth rate, high death rate'], a: 2, assign: 9},
+            {q: 'The logistic growth equation curve is', o: ['I-shaped', 'J-shaped', 'S-shaped', 'U-shaped'], a: 2, assign: 9},
+            {q: 'Which of these is a preventive check according to Malthus?', o: ['foresight', 'vice', 'misery', 'flood'], a: 0, assign: 9},
+            {q: 'Which of these is not a pillar of sustainability?', o: ['environmental sustainability', 'economic sustainability', 'trans-boundary sustainability', 'social sustainability'], a: 2, assign: 9},
+            {q: 'The book "An Essay on the Principle of Population" was written by', o: ['Darwin', 'Malthus', 'Spencer', 'Owens'], a: 1, assign: 9},
+            {q: 'Which of these is a positive check according to Malthus?', o: ['late marriage', 'war', 'celibacy', 'moral restraint'], a: 1, assign: 9},
+            {q: 'Hydrogen for nuclear fusion comes under the category of', o: ['potential resources', 'actual resources', 'reserve resources', 'stock resources'], a: 3, assign: 10},
+            {q: 'Which of these is the largest source of ammonia (NH3) in the atmosphere?', o: ['animal manure', 'mineral fertiliser', 'crops and their decomposition', 'human waste'], a: 0, assign: 10},
+            {q: '"the part of actual resources that can be developed profitably in the future" is a definition of', o: ['potential resources', 'actual resources', 'reserve resources', 'stock resources'], a: 2, assign: 10},
+            {q: 'Timber from forests that is being harvested can be categorised under', o: ['potential resources', 'actual resources', 'reserve resources', 'stock resources'], a: 1, assign: 10},
+            {q: 'Rain gardens are primarily meant to', o: ['reduce water usage', 'increase recharge to groundwater', 'protect existing water sources', 'increase water flow to streams'], a: 1, assign: 10},
+            {q: 'Oil that has not been drilled can be categorised under', o: ['potential resources', 'actual resources', 'reserve resources', 'stock resources'], a: 2, assign: 10},
+            {q: 'Which of these is the largest source of nitrogen oxides in the atmosphere?', o: ['electricity generation', 'mobile sources', 'industrial processes', 'waste disposal'], a: 1, assign: 10},
+            {q: '"those resources that are currently being used after surveying, quantification and qualification" is a definition of', o: ['potential resources', 'actual resources', 'reserve resources', 'stock resources'], a: 1, assign: 10},
+            {q: '"those resources that may be used in the future" is a definition of', o: ['potential resources', 'actual resources', 'reserve resources', 'stock resources'], a: 0, assign: 10},
+            {q: 'Low concentration ores come in the category of', o: ['potential resources', 'actual resources', 'reserve resources', 'stock resources'], a: 0, assign: 10},
+            {q: 'New Delhi can best be categorised as', o: ['administrative town', 'industrial town', 'transport town', 'commercial town'], a: 0, assign: 11},
+            {q: 'Which of these is a factor governing barrier effect of roads?', o: ['traffic intensity', 'speed of vehicles', 'driver sensitivity', 'all of these'], a: 3, assign: 11},
+            {q: 'Which of these is a factor governing barrier effect of roads?', o: ['presence and location of animal crossings', 'movement pattern of species', 'species specific preference of road use', 'all of these'], a: 3, assign: 11},
+            {q: 'Varanasi can best be categorised as', o: ['mining town', 'garrison town', 'educational town', 'religious town'], a: 3, assign: 11},
+            {q: '"the ability to produce a good using fewer inputs than another producer" is', o: ['comparative advantage', 'absolute advantage', 'production advantage', 'resource advantage'], a: 1, assign: 11},
+            {q: '"the price of a good that prevails in the world market for that good" is the definition of', o: ['export price', 'import price', 'world price', 'domestic price'], a: 2, assign: 11},
+            {q: 'Visakhapatnam can best be categorised as', o: ['administrative town', 'industrial town', 'transport town', 'commercial town'], a: 2, assign: 11},
+            {q: 'Which of these is / are example(s) of mitigation measures to mitigate impacts of linear infrastructure on wildlife?', o: ['land bridges', 'canopy bridges', 'glider poles', 'all of these'], a: 3, assign: 11},
+            {q: 'Bhilai can best be categorised as', o: ['administrative town', 'industrial town', 'transport town', 'commercial town'], a: 1, assign: 11},
+            {q: '"the ability to produce a good at a lower opportunity cost than another producer" is a definition of', o: ['real advantage', 'monetary advantage', 'comparative advantage', 'opportunity advantage'], a: 2, assign: 11},
+            {q: 'The time of flight for LiDAR is 0.00001 sec. Find the distance of the object from the instrument.', o: ['500 m', '1000 m', '1500 m', '2000 m'], a: 2, assign: 12},
+            {q: 'Which of these uses imputed willingness to pay?', o: ['market price method', 'replacement cost method', 'travel cost method', 'contingent valuation method'], a: 3, assign: 12},
+            {q: '"The situation of people, infrastructure, housing, production capacities and other tangible human assets located in hazard-prone areas." is a definition for', o: ['hazard', 'exposure', 'vulnerability', 'disaster'], a: 1, assign: 12},
+            {q: '"A process, phenomenon or human activity that may cause loss of life, injury or other health impacts, property damage, social and economic disruption or environmental degradation." is a definition for', o: ['hazard', 'exposure', 'vulnerability', 'disaster'], a: 0, assign: 12},
+            {q: '"A serious disruption of the functioning of a community or a society at any scale due to hazardous events interacting with conditions of exposure, vulnerability and capacity, leading to one or more of the following: human, material, economic and environmental losses and impacts." is a definition for', o: ['hazard', 'exposure', 'vulnerability', 'disaster'], a: 3, assign: 12},
+            {q: '"The combination of all the strengths, attributes and resources available within an organisation, community or society to manage and reduce disaster risks and strengthen resilience." is a definition for', o: ['contingency', 'disaster management', 'vulnerability', 'capacity'], a: 3, assign: 12},
+            {q: 'Bathymetric LiDAR uses', o: ['far infrared light', 'near infrared light', 'orange light', 'green light'], a: 3, assign: 12},
+            {q: 'IMU stands for', o: ['Imperial metering unit', 'Inertial metering unit', 'Imperial measurement unit', 'Inertial measurement unit'], a: 3, assign: 12},
+            {q: 'Which of these is not a consumptive value?', o: ['timber', 'firewood', 'non-timber forest products', 'education'], a: 3, assign: 12},
+            {q: 'The frequency of flyovers is an indicator of', o: ['spatial resolution', 'temporal resolution', 'spectral resolution', 'radiometric resolution'], a: 1, assign: 12}
+        ];
+
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let answered = false;
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function initQuiz() {
+            shuffledQuestions = shuffleArray(questions);
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            answered = false;
+            updateStats();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= shuffledQuestions.length) {
+                showCompletion();
+                return;
+            }
+
+            answered = false;
+            const question = shuffledQuestions[currentQuestionIndex];
+            
+            document.getElementById('questionNum').textContent = `Question ${currentQuestionIndex + 1}`;
+            document.getElementById('assignmentTag').textContent = `Assignment ${question.assign}`;
+            document.getElementById('questionText').textContent = question.q;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            question.o.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.innerHTML = `
+                    <div class="option-label">${String.fromCharCode(65 + index)}</div>
+                    <div>${option}</div>
+                `;
+                optionDiv.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+
+        function selectOption(selectedIndex) {
+            if (answered) return;
+            
+            answered = true;
+            const question = shuffledQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            
+            options[selectedIndex].classList.add('selected');
+            
+            if (selectedIndex === question.a) {
+                options[selectedIndex].classList.add('correct');
+                score++;
+                correctAnswers++;
+            } else {
+                options[selectedIndex].classList.add('incorrect');
+                options[question.a].classList.add('correct');
+                incorrectAnswers++;
+            }
+            
+            updateStats();
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 2000);
+        }
+
+        function updateStats() {
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correctAnswers;
+            document.getElementById('incorrect').textContent = incorrectAnswers;
+        }
+
+        function showCompletion() {
+            document.getElementById('quizSection').classList.add('hidden');
+            document.getElementById('completionSection').classList.remove('hidden');
+            
+            const percentage = ((score / shuffledQuestions.length) * 100).toFixed(1);
+            document.getElementById('finalScore').textContent = `${score}/${shuffledQuestions.length}`;
+            document.getElementById('percentage').textContent = `You scored ${percentage}% on the quiz!`;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quizSection').classList.remove('hidden');
+            document.getElementById('completionSection').classList.add('hidden');
+            initQuiz();
+        }
+
+        // Initialize quiz on load
+        initQuiz();
+    </script>
+</body>
+</html>
